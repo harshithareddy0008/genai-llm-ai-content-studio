@@ -1,0 +1,33 @@
+# Render Blueprint: create TWO web services, one backend and one frontend.
+# Set APP_ACCESS_TOKEN to the exact same manually generated value in BOTH services.
+services:
+  - type: web
+    name: ai-content-studio-api
+    runtime: python
+    plan: free
+    buildCommand: pip install uv && uv sync --no-dev
+    startCommand: uv run --no-sync uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: APP_ACCESS_TOKEN
+        sync: false
+
+  - type: web
+    name: ai-content-studio-web
+    runtime: python
+    plan: free
+    buildCommand: pip install uv && uv sync --no-dev
+    startCommand: uv run --no-sync streamlit run frontend/app.py --server.address 0.0.0.0 --server.port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: API_BASE_URL
+        sync: false
+      - key: APP_ACCESS_TOKEN
+        sync: false

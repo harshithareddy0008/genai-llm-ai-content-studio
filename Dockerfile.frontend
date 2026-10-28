@@ -1,0 +1,12 @@
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UV_NO_DEV=1
+
+COPY pyproject.toml ./
+RUN uv sync --no-dev --no-install-project
+COPY frontend ./frontend
+COPY .streamlit ./.streamlit
+
+EXPOSE 8501
+CMD ["uv", "run", "--no-sync", "streamlit", "run", "frontend/app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
